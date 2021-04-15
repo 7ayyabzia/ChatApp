@@ -1,0 +1,84 @@
+﻿@model ChatApp.ViewModels.ChatContactViewModel
+
+@{
+    ViewBag.Title = "Home Page";
+}
+@section css{
+    <link href="~/Content/css/chat.css" rel="stylesheet" />
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-3 contacts-list" id="contacts-list">
+            <div>
+                <div id="plist" class="people-list">
+                    <div class="contacts-header clearfix">
+                        <div class="nav nav-tabs tab-nav-right" role="tablist">
+                            <div role="presentation" class="text-center active users-tab-btn" style="width: 50%; padding: 20px;">
+                                <a href="#users" data-toggle="tab" class="show">Users</a>
+                            </div>
+                            <div role="presentation" class="text-center groups-tab-btn" style="width: 50%; padding: 20px;">
+                                <a href="#groups" data-toggle="tab" class="">Groups</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-content contacts-container active" id="users">
+                        <div id="chat_user">
+                            <ul class="chat-list list-unstyled pointer contacts">
+                                @foreach (var user in Model.Users)
+                                {
+                                    <li class="row clearfix contact br-btm" data-id="@user.Id" data-name="@user.Name">
+                                        <div class="col-12 about">
+                                            <div class="name">@user.Name</div>
+                                            <div class="status">@user.Email</div>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="tab-content contacts-container" id="groups">
+                        <div id="chat_user">
+                            <div class="form-group" style="margin: 10px 0 10px 5px">
+                                <a href="~/Groups/Add" class="text-info p-1">Create New Group</a>
+                            </div>
+                            <ul class="chat-list list-unstyled pointer groups">
+                                @foreach (var group in Model.Groups)
+                                {
+                                    <li class="row clearfix contact br-btm" data-id="@group.GroupID" data-name="@group.GroupName">
+                                        <div class="col-12 about">
+                                            <div class="name">@group.GroupName</div>
+                                            <div class="status">@group.GroupUsers.Count() Users</div>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+            <div class="chat" id="chat">
+                <div class="chat-header clearfix">
+                    <div class="chat-about">
+                        <input type="hidden" name="UserID" value="@Model.UserID" />
+                        <div class="chat-with"><span class="name"></span></div>
+                    </div>
+                </div>
+                <div class="chat-history" id="chat-conversation">
+                    <ul>
+
+                    </ul>
+                </div>
+                <div class="chat-message clearfix">
+                    <div class="form-group">
+                        <textarea class="form-control" autocomplete="off" placeholder="Enter text here.." id="message-box"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script src="~/Content/js/chat.js"></script>
+}

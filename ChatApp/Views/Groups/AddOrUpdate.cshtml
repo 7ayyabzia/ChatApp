@@ -1,0 +1,82 @@
+﻿@section css{
+    <style>
+        body {
+            height: 100vh;
+            background-image: url("/Content/img/bg-01.jpg");
+            /*display: flex;*/
+            /*justify-content: center;
+            align-items: center;*/
+            background-repeat: round;
+        }
+
+        .form-body {
+            padding: 30px 20px 10px 20px;
+            background: #fff;
+            width: 40%;
+            margin:100px auto;
+            border-radius: 10px
+        }
+        .form-body label {
+            font-weight:600;
+        }
+    </style>
+}
+
+<div class="form-body shadow-lg">
+    <h2 class="text-center">@ViewBag.Title</h2>
+    <div class="form-group">
+        <label>Group Name</label>
+        <input type="text" class="form-control" name="Name" required />
+    </div>
+    <div class="form-group group-contacts">
+        <label style="width:100%; padding-bottom:10px">
+            Group Contacts
+            <a class="float-right btn add-row-btn" style="font-size: 25px; padding-right: 5px; height: 25px;">+</a>
+        </label>
+    </div>
+    <div class="form-group">
+        <div class="text-info pl-1"><strong>Note:</strong> You'll be automatically added to this group</div>
+    </div>
+    <div class="form-group text-right pt-3">
+        <input type="submit" class="btn btn bg-info text-white" value="Save" />
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(function () {
+            JsonCall("Groups", "GetUsers");
+            let users = list.map((obj) => {
+                return `<option value="${obj.Id}">${obj.Name}</option>`;
+            });
+            $row = `<select class="form-control mb-2" name="user">
+                <option hidden value=''>Select User</option>
+                ${users.join('')}
+            </select>`;
+            $('.group-contacts').append($row);
+
+            $('.add-row-btn').click(function () {
+                if ($('.group-contacts .form-control').length == users.length) return;
+                $('.group-contacts').append($row);
+            });
+
+            $('input[type=submit]').click(function () {
+                let groupUsers = [];
+                document.querySelectorAll('select[name=user]').forEach((obj) => {
+                    if (obj.value != undefined || obj.value != '') groupUsers.push({ userId: obj.value });
+                })
+                let group = {
+                    groupName: $('input[name=Name]').val(),
+                    groupUsers: groupUsers
+                };
+                let param =  { 'group': JSON.stringify(group) };
+                console.log(param);
+                JsonCallParam("Groups", "AddOrUpdateGroup", param)
+                if (list.StatusCode == 400)
+                    alert(list.Response);
+                else
+                    window.location.href = '/Chat/Index';
+            })
+        })
+    </script>
+}

@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    @RenderSection("css", required: false)
+    <style>
+        .pull-right { right: 0; left: auto !important; }
+        .not-menu { padding: 0 }
+        .not-menu .dropdown-item { border-bottom: 1px solid #CED4DA }
+        .not-menu .dropdown-item:last-child { border-bottom: 0 !important; }
+        .notifyjs-bootstrap-success{line-height:1 !important;}
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg bg-dark">
+        <a class="navbar-brand text-white" href="#" style="width:300px; text-align:center">Chat App</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto text-white">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" id="notificationsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Notifications
+                    </a>
+                    <ul class="dropdown-menu pull-right not-menu" id="notifications">
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        @HttpContext.Current.User.Identity.Name
+                    </a>
+                    <div class="dropdown-menu pull-right" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="~/Account/LogOff">Logout</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    @RenderBody()
+
+    <script src="~/Content/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/Content/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Content/lib/notify/notify.min.js"></script>
+
+    <script src="~/Scripts/jquery.signalR-2.2.2.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+
+    <script>
+        async function JsonCallParam(Controller, Action, Parameters) {
+            $.ajax({
+                type: "POST",
+                traditional: true,
+                async: false,
+                cache: false,
+                url: '/' + Controller + '/' + Action,
+                context: document.body,
+                data: Parameters,
+                success: function (json) {
+                    list = null; list = json;
+                },
+                error: function (error) {
+                    err = error; list = null;
+                },
+                statusCode: {
+                    200: () => { statusCode = 200; },
+                    400: () => { statusCode = 400; },
+                    500: () => { statusCode = 500; },
+                    403: () => { statusCode = 403; }
+                }
+            });
+        }
+        async function JsonCall(Controller, Action) {
+            $.ajax({
+                type: "POST",
+                traditional: true,
+                async: false,
+                cache: false,
+                url: '/' + Controller + '/' + Action,
+                context: document.body,
+                success: function (json) {
+                    list = null; list = json;
+                },
+                error: function (err) {
+                    list = null;
+                    //debugger;
+                },
+                statusCode: {
+                    400: function () {
+                        statusCode = 400;
+                    },
+                    200: function () {
+                        statusCode = 200;
+                    },
+                    500: function () {
+                        statusCode = 500;
+                    },
+                    403: () => { statusCode = 403; }
+                }
+            });
+        }
+
+        var chat = $.connection.chatHub;
+
+        chat.client.receiveNotification = function (message) {
+            message = JSON.parse(message);
+
+            $('#notificationsDropdown').css({ background: 'green' });
+            $('#notifications').prepend(`<li class="dropdown-item">
+                    <label>New message in <strong>${message.RecipientType} Chat</strong></label>
+                    <p class="mb-1"><strong>${message.User.Name}:</strong> ${message.MessageText}</p>
+                </li>`);
+            (new Audio('/Content/sound/notify.mp3')).play()
+            $('#notificationsDropdown').notify(`Message from ${message.User.Name}: ${message.MessageText}`, { position: "bottom-right", className: 'success' });
+        };
+        $('#notificationsDropdown').click(function () {
+            $('#notificationsDropdown').css({ background: 'transparent' });
+        })
+
+        $.connection.hub.start().done();
+
+    </script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

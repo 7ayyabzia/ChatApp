@@ -1,0 +1,53 @@
+﻿@model ChatApp.Models.LoginViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="~/Content/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    <style>
+        body {
+            height: 100vh;
+            background-image: url("/Content/img/bg-01.jpg");
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-repeat: round;
+        }
+
+        .form-body {
+            padding: 30px 20px;
+            background: #fff;
+            width: 28%;
+            border-radius: 10px
+        }
+    </style>
+</head>
+<body>
+    <div class="form-body shadow-lg">
+        <h2 class="text-center">Login</h2>
+        <form action="~/Account/Login" method="post">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <label>Email</label>
+                <input type="text" class="form-control" name="Email" required />
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-control" name="Password" required />
+            </div>
+            <div class="text-danger">@ViewBag.Error</div>
+            <div class="width-per-100">
+                <a href="~/Account/Register" class="float-left">Register</a>
+                <input type="submit" class="btn btn bg-info text-white float-right" value="Login" />
+            </div>
+        </form>
+    </div>
+    <script src="~/Content/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/Content/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
